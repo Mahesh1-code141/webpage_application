@@ -1,0 +1,36 @@
+pipeline {
+agent any
+
+stages {
+
+    stage('Checkout Code') {
+        steps {
+            git branch: 'main',
+                url: 'https://github.com/Mahesh1-code141/webpage_application.git'
+        }
+    }
+
+    stage('Build WAR') {
+        steps {
+            sh 'mvn clean package'
+        }
+    }
+
+    stage('Docker Build') {
+        steps {
+            sh 'docker build -t web_application:latest .'
+        }
+    }
+
+    stage('Run Container') {
+        steps {
+            sh '''
+            docker rm -f web_application || true
+            docker run -d -p 2002:8080 --name web_application web_application:latest
+            '''
+        }
+    }
+
+}
+
+}
